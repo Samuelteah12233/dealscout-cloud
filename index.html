@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DealScout Cloud Pro — Wholesale Deal & Lead Command</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --card: #161f33;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-soft: rgba(16, 185, 129, 0.14);
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --sky: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #263248;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 680px;
+      margin-inline: auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    h1 { font-size: 1.25rem; margin: 0; letter-spacing: -0.01em; }
+    .sub { font-size: 0.78rem; color: var(--muted); }
+    .badge {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat-val { font-size: 1.05rem; font-weight: 700; margin-top: 3px; color: var(--text); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 14px 0 8px;
+    }
+    .section-title:first-child { margin-top: 0; }
+    button.primary-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #022c22;
+      background: var(--accent);
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+    }
+    button.primary-btn:hover { background: var(--accent-hover); }
+    button.primary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+    .tag-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tag-label input { accent-color: var(--accent); width: 15px; height: 15px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 540px) {
+      .stats-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .mao-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--accent-soft);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.86rem;
+    }
+    .mao-amount { font-weight: 800; font-size: 1rem; color: var(--accent); }
+    .status-text { font-size: 0.83rem; color: var(--muted); margin-top: 8px; min-height: 18px; }
+    .actions-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .secondary-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 12px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
+    .secondary-btn:hover { border-color: var(--sky); }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 540px) { .toolbar { grid-template-columns: 1fr; } }
+    .toolbar input, .toolbar select { margin-bottom: 0; }
+    .lead-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .lead-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .lead-address { font-weight: 700; font-size: 0.98rem; }
+    .pill {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .pill-hot { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .pill-warm { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .pill-cool { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .lead-meta { font-size: 0.79rem; color: var(--muted); margin-bottom: 6px; }
+    .lead-tags { font-size: 0.8rem; color: var(--accent); margin-bottom: 6px; font-weight: 600; }
+    .lead-uw {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text);
+      background: var(--surface);
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+    .lead-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .lead-links a { color: var(--sky); text-decoration: none; font-size: 0.8rem; margin-right: 12px; font-weight: 600; }
+    .mini-select {
+      width: auto;
+      margin-bottom: 0;
+      padding: 5px 8px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+    .hidden { display: none; }
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .link-btn { background: none; border: none; color: var(--sky); cursor: pointer; font-size: 0.82rem; padding: 0; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>DealScout Cloud Pro 📍</h1>
+      <div class="sub">Distressed Field Logger • Underwriting • Pipeline</div>
+    </div>
+    <span class="badge" id="leadCount">0 Leads</span>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">Hot Leads (70+)</div>
+      <div class="stat-val" id="hotCount">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Total MAO Pipeline</div>
+      <div class="stat-val" id="pipelineMAO">$0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Active Deals</div>
+      <div class="stat-val" id="activeCount">0</div>
+    </div>
+  </div>
+
+  <!-- AUTH VIEW -->
+  <div id="authView" class="card">
+    <h2 style="margin-top:0;font-size:1.1rem;">Sign In / Create Account</h2>
+    <p class="lead-meta">Sync your off-market leads and deal math across devices.</p>
+    <input type="email" id="emailInput" placeholder="Email address" autocomplete="email" />
+    <input type="password" id="passwordInput" placeholder="Password (min 6 chars)" autocomplete="current-password" />
+    <div class="actions-row" style="margin-bottom:0;">
+      <button class="primary-btn" onclick="handleLogin()">Log In</button>
+      <button class="secondary-btn" onclick="handleSignUp()">Sign Up</button>
+    </div>
+    <div id="authStatus" class="status-text"></div>
+  </div>
+
+  <!-- MAIN APP VIEW -->
+  <div id="appView" class="hidden">
+    <div class="user-bar">
+      <span id="userEmailLabel"></span>
+      <button class="link-btn" onclick="handleLogout()">Log Out</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">1. Property & Distress Signals</div>
+      <input type="text" id="manualAddress" placeholder="Address (leave blank to reverse-geocode GPS, or type exact street)" />
+
+      <div class="tags" id="tagsGroup">
+        <label class="tag-label"><input type="checkbox" value="Overgrown Grass" data-pts="12" /> Overgrown Grass (+12)</label>
+        <label class="tag-label"><input type="checkbox" value="Boarded Windows" data-pts="22" /> Boarded Windows (+22)</label>
+        <label class="tag-label"><input type="checkbox" value="Vacant" data-pts="20" /> Vacant (+20)</label>
+        <label class="tag-label"><input type="checkbox" value="Roof Damage" data-pts="20" /> Roof Damage (+20)</label>
+        <label class="tag-label"><input type="checkbox" value="Neglected" data-pts="15" /> Neglected (+15)</label>
+        <label class="tag-label"><input type="checkbox" value="Absentee Owner" data-pts="15" /> Absentee Owner (+15)</label>
+      </div>
+
+      <div class="grid-2">
+        <input type="text" id="ownerName" placeholder="Owner name (optional)" />
+        <input type="text" id="ownerPhone" placeholder="Owner phone (optional)" />
+      </div>
+
+      <div class="section-title">2. Quick Wholesale Underwriting (70% Rule)</div>
+      <div class="grid-3">
+        <input type="number" id="arvInput" placeholder="Est. ARV ($)" oninput="updateMAO()" />
+        <input type="number" id="repairsInput" placeholder="Est. Repairs ($)" oninput="updateMAO()" />
+        <input type="number" id="feeInput" placeholder="Target Fee ($)" value="8000" oninput="updateMAO()" />
+      </div>
+
+      <div class="mao-banner">
+        <span>Max Allowable Offer (70% − Repairs − Fee):</span>
+        <span class="mao-amount" id="liveMAO">$0</span>
+      </div>
+
+      <textarea id="notes" rows="2" placeholder="Field notes (tax delinquency, code violation, inherited property, corner lot)..."></textarea>
+
+      <button class="primary-btn" id="gpsBtn" onclick="captureGPSLead()">
+        📍 Drop & Sync GPS Lead
+      </button>
+      <div id="status" class="status-text">Ready. Park safely and drop a lead or enter an address.</div>
+    </div>
+
+    <div class="actions-row">
+      <button class="secondary-btn" onclick="fetchLeads()">🔄 Sync Now</button>
+      <button class="secondary-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search address, owner, or notes..." oninput="renderLeads()" />
+      <select id="statusFilter" onchange="renderLeads()">
+        <option value="ALL">All Statuses</option>
+        <option value="New">New</option>
+        <option value="Skip Traced">Skip Traced</option>
+        <option value="Contacted">Contacted</option>
+        <option value="Offer Made">Offer Made</option>
+        <option value="Under Contract">Under Contract</option>
+        <option value="Dead">Dead</option>
+      </select>
+    </div>
+
+    <div id="leadsList"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://czdejfkeuuvcoaiqlvfd.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_l71R6MOvCOMFd9D8P9tP5w_5SRk-jY8';
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let cachedLeads = [];
+
+    function calculateMAO() {
+      const arv = Number(document.getElementById('arvInput').value) || 0;
+      const repairs = Number(document.getElementById('repairsInput').value) || 0;
+      const fee = Number(document.getElementById('feeInput').value) || 0;
+      if (!arv) return null;
+      return Math.max(0, Math.round(arv * 0.7 - repairs - fee));
+    }
+
+    function updateMAO() {
+      const mao = calculateMAO();
+      document.getElementById('liveMAO').textContent = mao === null ? '$0' : `$${mao.toLocaleString()}`;
+    }
+
+    function computeMotivationScore(tags, notes) {
+      let score = 20;
+      const checkedInputs = Array.from(document.querySelectorAll('#tagsGroup input:checked'));
+      for (const cb of checkedInputs) {
+        score += Number(cb.dataset.pts || 10);
+      }
+      const lower = (notes || '').toLowerCase();
+      if (lower.includes('absentee') || lower.includes('out of state')) score += 10;
+      if (lower.includes('probate') || lower.includes('inherited') || lower.includes('tax')) score += 12;
+      if (lower.includes('motivated') || lower.includes('distressed')) score += 10;
+      return Math.min(100, score);
+    }
+
+    function formatMoney(val) {
+      if (val == null || Number.isNaN(Number(val))) return '—';
+      return `$${Number(val).toLocaleString()}`;
+    }
+
+    async function initAuth() {
+      const { data: { session } } = await sb.auth.getSession();
+      toggleViews(session);
+      sb.auth.onAuthStateChange((_event, session) => toggleViews(session));
+    }
+
+    function toggleViews(session) {
+      const authView = document.getElementById('authView');
+      const appView = document.getElementById('appView');
+
+      if (session && session.user) {
+        authView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        document.getElementById('userEmailLabel').textContent = `👤 ${session.user.email}`;
+        fetchLeads();
+      } else {
+        authView.classList.remove('hidden');
+        appView.classList.add('hidden');
+        cachedLeads = [];
+        updateDashboardStats();
+      }
+    }
+
+    async function handleSignUp() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const status = document.getElementById('authStatus');
+      status.textContent = 'Creating account...';
+      const { error } = await sb.auth.signUp({ email, password });
+      status.textContent = error
+        ? `❌ ${error.message}`
+        : '✅ Account created! Check your email or click Log In if confirmation is disabled.';
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const status = document.getElementById('authStatus');
+      status.textContent = 'Signing in...';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) status.textContent = `❌ ${error.message}`;
+    }
+
+    async function handleLogout() {
+      await sb.auth.signOut();
+    }
+
+    async function fetchLeads() {
+      const { data, error } = await sb
+        .from('leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('status').textContent = `❌ Sync error: ${error.message}`;
+        return;
+      }
+
+      cachedLeads = data || [];
+      document.getElementById('status').textContent = `✅ Synced ${cachedLeads.length} lead(s) from cloud.`;
+      updateDashboardStats();
+      renderLeads();
+    }
+
+    async function resolveCoordinates(manualAddr) {
+      if (!navigator.geolocation) {
+        return { lat: null, lon: null, address: manualAddr || 'Manual Lead (No GPS)' };
+      }
+
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = Number(pos.coords.latitude.toFixed(6));
+            const lon = Number(pos.coords.longitude.toFixed(6));
+            let address = manualAddr || `${lat}, ${lon}`;
+
+            if (!manualAddr) {
+              document.getElementById('status').textContent = '🗺️ Resolving street address...';
+              try {
+                const res = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+                  { headers: { 'Accept': 'application/json' } }
+                );
+                const data = await res.json();
+                if (data && data.address) {
+                  const num = data.address.house_number || '';
+                  const road = data.address.road || '';
+                  const city = data.address.city || data.address.town || data.address.village || '';
+                  const postcode = data.address.postcode || '';
+                  const street = `${num} ${road}`.trim();
+                  address = [street, city, postcode].filter(Boolean).join(', ') || address;
+                }
+              } catch (err) {
+                console.warn('Reverse geocode fallback to coords:', err);
+              }
+            }
+            resolve({ lat, lon, address });
+          },
+          () => {
+            resolve({ lat: null, lon: null, address: manualAddr || 'GPS Unavailable — Enter Address' });
+          },
+          { enableHighAccuracy: true, timeout: 12000 }
+        );
+      });
+    }
+
+    async function captureGPSLead() {
+      const btn = document.getElementById('gpsBtn');
+      const status = document.getElementById('status');
+      const manualAddr = document.getElementById('manualAddress').value.trim();
+
+      btn.disabled = true;
+      status.textContent = manualAddr ? '☁️ Saving lead...' : '🛰️ Locking GPS...';
+
+      const geo = await resolveCoordinates(manualAddr);
+      const tags = Array.from(document.querySelectorAll('#tagsGroup input:checked')).map((cb) => cb.value);
+      const notes = document.getElementById('notes').value.trim();
+      const ownerName = document.getElementById('ownerName').value.trim();
+      const ownerPhone = document.getElementById('ownerPhone').value.trim();
+      const arv = Number(document.getElementById('arvInput').value) || null;
+      const mao = calculateMAO();
+      const motivationScore = computeMotivationScore(tags, notes);
+
+      status.textContent = '☁️ Writing to Supabase...';
+
+      const { data, error } = await sb
+        .from('leads')
+        .insert([{
+          address: geo.address,
+          lat: geo.lat,
+          lon: geo.lon,
+          tags,
+          notes,
+          owner_name: ownerName,
+          owner_phone: ownerPhone,
+          estimated_arv: arv,
+          max_offer: mao,
+          motivation_score: motivationScore,
+          status: 'New'
+        }])
+        .select();
+
+      if (error) {
+        status.textContent = `❌ Save error: ${error.message}`;
+      } else {
+        cachedLeads = [...(data || []), ...cachedLeads];
+        updateDashboardStats();
+        renderLeads();
+        status.textContent = `✅ Saved: ${geo.address} (Score: ${motivationScore}/100)`;
+
+        document.getElementById('manualAddress').value = '';
+        document.getElementById('notes').value = '';
+        document.getElementById('ownerName').value = '';
+        document.getElementById('ownerPhone').value = '';
+        document.getElementById('arvInput').value = '';
+        document.getElementById('repairsInput').value = '';
+        updateMAO();
+        document.querySelectorAll('#tagsGroup input:checked').forEach((cb) => { cb.checked = false; });
+      }
+
+      btn.disabled = false;
+    }
+
+    async function updateLeadStatus(id, newStatus) {
+      const { error } = await sb.from('leads').update({ status: newStatus }).eq('id', id);
+      if (error) {
+        document.getElementById('status').textContent = `❌ Status update error: ${error.message}`;
+        return;
+      }
+      cachedLeads = cachedLeads.map((l) => (l.id === id ? { ...l, status: newStatus } : l));
+      updateDashboardStats();
+      renderLeads();
+    }
+
+    async function deleteLead(id) {
+      const { error } = await sb.from('leads').delete().eq('id', id);
+      if (error) {
+        document.getElementById('status').textContent = `❌ Delete error: ${error.message}`;
+        return;
+      }
+      cachedLeads = cachedLeads.filter((l) => l.id !== id);
+      updateDashboardStats();
+      renderLeads();
+    }
+
+    function updateDashboardStats() {
+      const count = cachedLeads.length;
+      document.getElementById('leadCount').textContent = `${count} ${count === 1 ? 'Lead' : 'Leads'}`;
+
+      const hot = cachedLeads.filter((l) => (l.motivation_score || 0) >= 70).length;
+      document.getElementById('hotCount').textContent = String(hot);
+
+      const totalMAO = cachedLeads
+        .filter((l) => l.status !== 'Dead')
+        .reduce((sum, l) => sum + (Number(l.max_offer) || 0), 0);
+      document.getElementById('pipelineMAO').textContent = `$${totalMAO.toLocaleString()}`;
+
+      const active = cachedLeads.filter((l) => l.status && l.status !== 'Dead').length;
+      document.getElementById('activeCount').textContent = String(active);
+    }
+
+    function renderLeads() {
+      const list = document.getElementById('leadsList');
+      const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      const statusFilter = document.getElementById('statusFilter')?.value || 'ALL';
+
+      const filtered = cachedLeads.filter((lead) => {
+        const matchesStatus = statusFilter === 'ALL' || (lead.status || 'New') === statusFilter;
+        const haystack = [
+          lead.address,
+          lead.notes,
+          lead.owner_name,
+          lead.owner_phone,
+          ...(Array.isArray(lead.tags) ? lead.tags : [])
+        ].join(' ').toLowerCase();
+        const matchesQuery = !query || haystack.includes(query);
+        return matchesStatus && matchesQuery;
+      });
+
+      list.replaceChildren();
+
+      if (!filtered.length) {
+        const empty = document.createElement('div');
+        empty.className = 'lead-meta';
+        empty.style.textAlign = 'center';
+        empty.style.padding = '18px';
+        empty.textContent = 'No matching leads yet.';
+        list.appendChild(empty);
+        return;
+      }
+
+      const statuses = ['New', 'Skip Traced', 'Contacted', 'Offer Made', 'Under Contract', 'Dead'];
+
+      filtered.forEach((lead) => {
+        const item = document.createElement('div');
+        item.className = 'lead-item';
+
+        const top = document.createElement('div');
+        top.className = 'lead-top';
+
+        const addr = document.createElement('div');
+        addr.className = 'lead-address';
+        addr.textContent = lead.address || 'Unknown address';
+
+        const score = Number(lead.motivation_score) || 20;
+        const pill = document.createElement('span');
+        pill.className = `pill ${score >= 70 ? 'pill-hot' : score >= 45 ? 'pill-warm' : 'pill-cool'}`;
+        pill.textContent = `Score ${score}`;
+
+        top.appendChild(addr);
+        top.appendChild(pill);
+        item.appendChild(top);
+
+        const metaParts = [];
+        if (lead.created_at) metaParts.push(new Date(lead.created_at).toLocaleString());
+        if (lead.lat != null && lead.lon != null) metaParts.push(`${lead.lat}, ${lead.lon}`);
+        if (lead.owner_name) metaParts.push(`Owner: ${lead.owner_name}`);
+        if (lead.owner_phone) metaParts.push(`Tel: ${lead.owner_phone}`);
+
+        const meta = document.createElement('div');
+        meta.className = 'lead-meta';
+        meta.textContent = metaParts.join(' • ');
+        item.appendChild(meta);
+
+        if (Array.isArray(lead.tags) && lead.tags.length) {
+          const tagsEl = document.createElement('div');
+          tagsEl.className = 'lead-tags';
+          tagsEl.textContent = lead.tags.join(' • ');
+          item.appendChild(tagsEl);
+        }
+
+        const uw = document.createElement('div');
+        uw.className = 'lead-uw';
+        uw.innerHTML = `
+          <span>ARV: <strong>${formatMoney(lead.estimated_arv)}</strong></span>
+          <span>MAO: <strong>${formatMoney(lead.max_offer)}</strong></span>
+          <span>Stage: <strong>${lead.status || 'New'}</strong></span>
+        `;
+        item.appendChild(uw);
+
+        if (lead.notes) {
+          const notesEl = document.createElement('div');
+          notesEl.className = 'lead-meta';
+          notesEl.textContent = lead.notes;
+          item.appendChild(notesEl);
+        }
+
+        const footer = document.createElement('div');
+        footer.className = 'lead-footer';
+
+        const links = document.createElement('div');
+        links.className = 'lead-links';
+        const mapQuery = lead.lat != null && lead.lon != null
+          ? `${lead.lat},${lead.lon}`
+          : encodeURIComponent(lead.address || '');
+        links.innerHTML = `
+          <a href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" rel="noopener">Maps ↗</a>
+          <a href="https://www.truepeoplesearch.com/" target="_blank" rel="noopener">Skip Trace ↗</a>
+        `;
+
+        const controls = document.createElement('div');
+        controls.style.display = 'flex';
+        controls.style.alignItems = 'center';
+        controls.style.gap = '10px';
+
+        const sel = document.createElement('select');
+        sel.className = 'mini-select';
+        statuses.forEach((st) => {
+          const opt = document.createElement('option');
+          opt.value = st;
+          opt.textContent = st;
+          if ((lead.status || 'New') === st) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.onchange = () => updateLeadStatus(lead.id, sel.value);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del-btn';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => deleteLead(lead.id);
+
+        controls.appendChild(sel);
+        controls.appendChild(delBtn);
+
+        footer.appendChild(links);
+        footer.appendChild(controls);
+        item.appendChild(footer);
+
+        list.appendChild(item);
+      });
+    }
+
+    function exportCSV() {
+      const escapeCSV = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+      const headers = [
+        'Created At', 'Status', 'Score', 'Address', 'Owner Name',
+        'Owner Phone', 'Est. ARV', 'MAO', 'Lat', 'Lon', 'Tags', 'Notes'
+      ];
+      const rows = cachedLeads.map((l) => [
+        l.created_at,
+        l.status || 'New',
+        l.motivation_score ?? '',
+        l.address,
+        l.owner_name || '',
+        l.owner_phone || '',
+        l.estimated_arv ?? '',
+        l.max_offer ?? '',
+        l.lat ?? '',
+        l.lon ?? '',
+        Array.isArray(l.tags) ? l.tags.join('; ') : (l.tags || ''),
+        l.notes || ''
+      ]);
+      const csv = [headers, ...rows].map((row) => row.map(escapeCSV).join(',')).join('\n');
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      link.download = `dealscout-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    initAuth();
+  </script>
+</body>
+</html>
