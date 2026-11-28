@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>DealScout Cloud Pro — Wholesale Deal & Lead Command</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>DealScout Cloud Pro</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #090d16;
-      --surface: #111827;
-      --card: #161f33;
-      --card-2: #1b2640;
-      --accent: #10b981;
-      --accent-hover: #059669;
-      --accent-soft: rgba(16, 185, 129, 0.14);
+      --bg: #0c0d0f;
+      --surface: #15171b;
+      --card: #1c1f24;
+      --card-2: #242830;
+      --accent: #d4f833;
+      --accent-hover: #c1e622;
+      --accent-soft: rgba(212, 248, 51, 0.14);
+      --green: #10b981;
       --warn: #f59e0b;
       --danger: #ef4444;
       --sky: #38bdf8;
       --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #263248;
+      --muted: #8e95a2;
+      --border: #2a2f38;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -27,65 +28,197 @@
     }
     body {
       margin: 0;
-      padding: 16px 16px 40px;
+      padding: 18px 16px calc(92px + env(safe-area-inset-bottom));
       background: var(--bg);
       color: var(--text);
-      max-width: 740px;
+      max-width: 540px;
       margin-inline: auto;
+      min-height: 100dvh;
     }
-    header {
+
+    /* Top Header */
+    .app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      margin-bottom: 16px;
     }
-    h1 { font-size: 1.25rem; margin: 0; letter-spacing: -0.01em; cursor: pointer; }
-    h2 { margin: 0 0 8px; font-size: 1.08rem; }
-    .sub { font-size: 0.78rem; color: var(--muted); }
+    .app-header h1 { font-size: 1.25rem; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+    .sub { font-size: 0.76rem; color: var(--muted); }
     .badge {
       background: var(--card);
       border: 1px solid var(--border);
-      padding: 5px 11px;
+      padding: 6px 12px;
       border-radius: 999px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--accent);
       font-weight: 700;
     }
 
-    /* Top Segmented Navigation */
-    .tab-nav {
+    /* Standalone Login Screen */
+    .login-wrap {
+      min-height: calc(100dvh - 110px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(212, 248, 51, 0.3);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      width: fit-content;
+      margin-bottom: 12px;
+    }
+
+    /* Fixed Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 540px;
+      background: rgba(21, 23, 27, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
+      padding: 8px 6px calc(10px + env(safe-area-inset-bottom));
+      z-index: 50;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 4px 2px;
+      border-radius: 10px;
+      transition: color 0.15s ease;
+    }
+    .nav-item svg { width: 21px; height: 21px; stroke-width: 2; }
+    .nav-item.active { color: var(--accent); }
+    .nav-item.active svg { stroke: var(--accent); }
+
+    /* Cards & Containers */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    h2 { margin: 0 0 8px; font-size: 1.06rem; font-weight: 700; }
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 12px 0 8px;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 13px;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+    .stat-val { font-size: 1.18rem; font-weight: 800; margin-top: 4px; color: var(--text); }
+
+    /* Form Controls */
+    label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    input, textarea, select {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    /* Buttons */
+    button.primary-btn {
+      width: 100%;
+      padding: 13px 16px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0c0d0f;
+      background: var(--accent);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    button.primary-btn:hover { background: var(--accent-hover); }
+    button.primary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .secondary-btn {
+      flex: 1;
+      padding: 11px 14px;
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .logout-pill-btn {
+      width: 100%;
+      padding: 13px;
+      background: #f8fafc;
+      color: #0c0d0f;
+      border: none;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .actions-row { display: flex; gap: 10px; margin-bottom: 12px; }
+
+    /* Tags & Stage Pills */
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 12px; }
+    .tag-label {
+      display: inline-flex;
+      align-items: center;
       gap: 6px;
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 6px;
-      border-radius: 14px;
-      margin-bottom: 14px;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      padding: 9px 8px;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
       cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.15s ease, color 0.15s ease;
+      user-select: none;
     }
-    .tab-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
-    .tab-btn.active {
-      background: var(--card-2);
-      color: var(--accent);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
+    .tag-label input { accent-color: var(--accent); width: 14px; height: 14px; margin: 0; }
 
-    /* Segmented Stage Pills */
     .stage-pills {
       display: flex;
       gap: 6px;
@@ -96,306 +229,138 @@
     }
     .stage-pills::-webkit-scrollbar { display: none; }
     .pill-tab {
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 999px;
-      font-size: 0.77rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
     }
     .pill-tab.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: rgba(16, 185, 129, 0.45);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    @media (min-width: 540px) {
-      .stats-grid.four { grid-template-columns: repeat(4, 1fr); }
-    }
-    .stat-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-    }
-    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-    .stat-val { font-size: 1.08rem; font-weight: 800; margin-top: 4px; color: var(--text); }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 15px;
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin: 14px 0 8px;
-    }
-    .section-title:first-child { margin-top: 0; }
-
-    button.primary-btn {
-      width: 100%;
-      padding: 13px 14px;
-      font-size: 0.96rem;
-      font-weight: 700;
-      color: #022c22;
       background: var(--accent);
-      border: none;
-      border-radius: 11px;
-      cursor: pointer;
-    }
-    button.primary-btn:hover { background: var(--accent-hover); }
-    button.primary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
-    .tag-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 7px 11px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      user-select: none;
-    }
-    .tag-label input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    @media (max-width: 540px) {
-      .tab-nav { grid-template-columns: repeat(2, 1fr); }
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    }
-
-    label {
-      display: block;
-      font-size: 0.76rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    input:focus, textarea:focus, select:focus {
-      outline: none;
+      color: #0c0d0f;
       border-color: var(--accent);
     }
 
+    /* Summary & Settings Rows */
     .summary-box {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 12px;
+      border-radius: 14px;
+      padding: 12px 14px;
       margin-bottom: 12px;
     }
-    .summary-row {
+    .summary-row, .settings-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 5px 0;
-      font-size: 0.86rem;
-      border-bottom: 1px solid rgba(38, 50, 72, 0.55);
+      padding: 9px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(42, 47, 56, 0.7);
     }
-    .summary-row:last-child { border-bottom: none; }
+    .summary-row:last-child, .settings-row:last-child { border-bottom: none; }
     .mao-highlight { font-weight: 800; font-size: 1rem; color: var(--accent); }
-    .sky-highlight { font-weight: 800; font-size: 0.98rem; color: var(--sky); }
+    .sky-highlight { font-weight: 800; font-size: 0.96rem; color: var(--sky); }
 
-    .status-text { font-size: 0.83rem; color: var(--muted); margin-top: 8px; min-height: 18px; }
-    .actions-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-    .secondary-btn {
-      flex: 1;
-      min-width: 120px;
-      padding: 10px 12px;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.86rem;
-      cursor: pointer;
-    }
-    .secondary-btn:hover { border-color: var(--sky); }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    @media (max-width: 540px) { .toolbar { grid-template-columns: 1fr; } }
-    .toolbar input, .toolbar select { margin-bottom: 0; }
-
+    /* Lead Cards */
     .lead-item {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 14px;
       margin-bottom: 10px;
     }
-    .lead-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .lead-address { font-weight: 700; font-size: 0.98rem; }
-    .pill {
-      font-size: 0.74rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-    .pill-hot { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
-    .pill-warm { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
-    .pill-cool { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
-
-    .lead-meta { font-size: 0.79rem; color: var(--muted); margin-bottom: 6px; }
-    .lead-tags { font-size: 0.8rem; color: var(--accent); margin-bottom: 6px; font-weight: 600; }
+    .lead-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+    .lead-address { font-weight: 700; font-size: 0.95rem; }
+    .pill { font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .pill-hot { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
+    .pill-warm { background: rgba(245, 158, 11, 0.18); color: #fcd34d; }
+    .pill-cool { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
+    .lead-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+    .lead-tags { font-size: 0.78rem; color: var(--accent); margin-bottom: 6px; font-weight: 600; }
     .lead-uw {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      font-size: 0.8rem;
-      color: var(--text);
+      font-size: 0.79rem;
       background: var(--surface);
       padding: 8px 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin: 8px 0;
     }
-    .lead-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
+    .lead-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     .lead-links a, .calc-link-btn {
       color: var(--sky);
       text-decoration: none;
-      font-size: 0.8rem;
-      margin-right: 12px;
+      font-size: 0.79rem;
+      margin-right: 10px;
       font-weight: 600;
       background: none;
       border: none;
       padding: 0;
       cursor: pointer;
     }
-    .mini-select {
-      width: auto;
-      margin-bottom: 0;
-      padding: 5px 8px;
-      font-size: 0.78rem;
-      border-radius: 8px;
-    }
-    .del-btn {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0;
+    .mini-select { width: auto; margin-bottom: 0; padding: 5px 9px; font-size: 0.76rem; border-radius: 999px; }
+    .del-btn { background: none; border: none; color: var(--danger); font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 0; }
+    .status-text { font-size: 0.8rem; color: var(--muted); margin-top: 8px; min-height: 18px; }
+    .avatar-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 0 auto 10px;
     }
     .hidden { display: none !important; }
-    .user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 12px;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .link-btn {
-      background: none;
-      border: none;
-      color: var(--sky);
-      cursor: pointer;
-      font-size: 0.82rem;
-      padding: 0;
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div>
-      <h1 onclick="navigateTo('/dashboard')">DealScout Cloud Pro 📍</h1>
-      <div class="sub">Distressed Field Logger • APR & Deal Math • Pipeline</div>
+  <!-- 1. STANDALONE LOGIN SCREEN (#/login) -->
+  <section id="view-login" class="login-wrap">
+    <div class="card">
+      <div class="brand-pill">DealScout Cloud Pro</div>
+      <h2 style="font-size:1.3rem;">Welcome back</h2>
+      <p class="lead-meta" style="margin-bottom:14px;">Sign in to access your wholesale pipeline, GPS field scout, and APR calculator.</p>
+      <label for="emailInput">Email Address</label>
+      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" placeholder="Min 6 characters" autocomplete="current-password" />
+      <button class="primary-btn" onclick="handleLogin()" style="margin-top:4px;">Sign In</button>
+      <button class="secondary-btn" onclick="handleSignUp()" style="width:100%; margin-top:8px;">Create Account</button>
+      <div id="authStatus" class="status-text"></div>
     </div>
-    <span class="badge" id="leadCount">0 Leads</span>
-  </header>
-
-  <!-- DEDICATED LOGIN VIEW (#/login) -->
-  <section id="view-login" class="card">
-    <h2 style="margin-top:0;font-size:1.15rem;">Account Sign In</h2>
-    <p class="lead-meta">Sign in to access your connected dashboard, leads pipeline, and APR calculator.</p>
-    <label for="emailInput">Email</label>
-    <input type="email" id="emailInput" placeholder="Email address" autocomplete="email" />
-    <label for="passwordInput">Password</label>
-    <input type="password" id="passwordInput" placeholder="Password (min 6 chars)" autocomplete="current-password" />
-    <div class="actions-row" style="margin-bottom:0;">
-      <button class="primary-btn" onclick="handleLogin()">Log In</button>
-      <button class="secondary-btn" onclick="handleSignUp()">Sign Up</button>
-    </div>
-    <div id="authStatus" class="status-text"></div>
   </section>
 
-  <!-- AUTHENTICATED MULTI-VIEW SHELL -->
+  <!-- 2. AUTHENTICATED APP SHELL -->
   <div id="appView" class="hidden">
-    <div class="user-bar">
-      <span id="userEmailLabel"></span>
-      <span id="globalSyncStatus">Ready</span>
-      <button class="link-btn" onclick="handleLogout()">Log Out</button>
-    </div>
+    <header class="app-header">
+      <div>
+        <h1 id="pageTitle">Home</h1>
+        <div class="sub" id="pageSubtitle">DealScout Cloud Pro</div>
+      </div>
+      <span class="badge" id="leadCount">0 Leads</span>
+    </header>
 
-    <!-- TOP SEGMENTED TABS -->
-    <nav class="tab-nav" aria-label="Primary Sections">
-      <a class="tab-btn active" href="#/dashboard" data-route="/dashboard">Dashboard</a>
-      <a class="tab-btn" href="#/capture" data-route="/capture">Drop Lead</a>
-      <a class="tab-btn" href="#/pipeline" data-route="/pipeline">Pipeline</a>
-      <a class="tab-btn" href="#/calculator" data-route="/calculator">APR & Deal Calc</a>
-    </nav>
-
-    <!-- 1. DASHBOARD PAGE (#/dashboard) -->
-    <section id="view-dashboard" class="route-view hidden">
-      <div class="stats-grid four">
+    <!-- TAB 1: HOME / DASHBOARD (#/dashboard) -->
+    <main id="view-dashboard" class="route-view hidden">
+      <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-label">Hot Leads (70+)</div>
           <div class="stat-val" id="hotCount">0</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Total MAO Pipeline</div>
-          <div class="stat-val" id="pipelineMAO">$0</div>
+          <div class="stat-label">MAO Pipeline</div>
+          <div class="stat-val" id="pipelineMAO" style="color:var(--accent);">$0</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Active Deals</div>
@@ -408,222 +373,205 @@
       </div>
 
       <div class="card">
-        <h2>Command Actions</h2>
-        <p class="lead-meta">Jump straight into scouting, working your lead stages, or underwriting financing/APR.</p>
-        <div class="grid-2" style="margin-bottom:8px;">
-          <button class="primary-btn" onclick="navigateTo('/capture')">📍 Drop GPS / Tax Lead</button>
-          <button class="secondary-btn" style="padding:13px;" onclick="navigateTo('/calculator')">🧮 Open APR Calculator</button>
-        </div>
+        <h2>Quick Actions</h2>
+        <p class="lead-meta">Capture distressed parcels or underwrite your next offer.</p>
         <div class="actions-row" style="margin-bottom:0;">
-          <button class="secondary-btn" onclick="navigateTo('/pipeline')">📋 View Segmented Pipeline</button>
-          <button class="secondary-btn" onclick="fetchLeads()">🔄 Sync Cloud Data</button>
+          <button class="primary-btn" onclick="navigateTo('/capture')">+ Drop Lead</button>
+          <button class="secondary-btn" onclick="navigateTo('/calculator')">APR Calc</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Top Priority Leads</h2>
+        <h2>Priority Leads</h2>
         <div id="dashboardTopLeads" class="lead-meta">Syncing leads...</div>
       </div>
-    </section>
+    </main>
 
-    <!-- 2. CAPTURE / FIELD & TAX LOGGER PAGE (#/capture) -->
-    <section id="view-capture" class="route-view hidden">
+    <!-- TAB 2: SCOUT / DROP LEAD (#/capture) -->
+    <main id="view-capture" class="route-view hidden">
       <div class="card">
-        <div class="section-title">1. Property & Distress Signals</div>
-        <input type="text" id="manualAddress" placeholder="Address (leave blank to reverse-geocode GPS, or type exact street)" />
+        <div class="section-title">Property & Distress Signals</div>
+        <input type="text" id="manualAddress" placeholder="Street address (or leave blank for GPS)" />
 
         <div class="tags" id="tagsGroup">
-          <label class="tag-label"><input type="checkbox" value="Overgrown Grass" data-pts="12" /> Overgrown Grass (+12)</label>
-          <label class="tag-label"><input type="checkbox" value="Boarded Windows" data-pts="22" /> Boarded Windows (+22)</label>
+          <label class="tag-label"><input type="checkbox" value="Overgrown Grass" data-pts="12" /> Overgrown (+12)</label>
+          <label class="tag-label"><input type="checkbox" value="Boarded Windows" data-pts="22" /> Boarded (+22)</label>
           <label class="tag-label"><input type="checkbox" value="Vacant" data-pts="20" /> Vacant (+20)</label>
-          <label class="tag-label"><input type="checkbox" value="Roof Damage" data-pts="20" /> Roof Damage (+20)</label>
+          <label class="tag-label"><input type="checkbox" value="Roof Damage" data-pts="20" /> Roof (+20)</label>
           <label class="tag-label"><input type="checkbox" value="Neglected" data-pts="15" /> Neglected (+15)</label>
-          <label class="tag-label"><input type="checkbox" value="Absentee Owner" data-pts="15" /> Absentee Owner (+15)</label>
+          <label class="tag-label"><input type="checkbox" value="Absentee Owner" data-pts="15" /> Absentee (+15)</label>
         </div>
 
         <div class="grid-2">
-          <input type="text" id="ownerName" placeholder="Owner name (optional)" />
-          <input type="text" id="ownerPhone" placeholder="Owner phone (optional)" />
+          <input type="text" id="ownerName" placeholder="Owner name" />
+          <input type="text" id="ownerPhone" placeholder="Owner phone" />
         </div>
 
-        <div class="section-title">2. Quick Wholesale Underwriting (70% Rule)</div>
+        <div class="section-title">70% Rule Underwriting</div>
         <div class="grid-3">
-          <input type="number" id="arvInput" placeholder="Est. ARV ($)" oninput="updateCaptureMAO()" />
-          <input type="number" id="repairsInput" placeholder="Est. Repairs ($)" oninput="updateCaptureMAO()" />
-          <input type="number" id="feeInput" placeholder="Target Fee ($)" value="8000" oninput="updateCaptureMAO()" />
+          <input type="number" id="arvInput" placeholder="ARV ($)" oninput="updateCaptureMAO()" />
+          <input type="number" id="repairsInput" placeholder="Repairs ($)" oninput="updateCaptureMAO()" />
+          <input type="number" id="feeInput" placeholder="Fee ($)" value="8000" oninput="updateCaptureMAO()" />
         </div>
 
         <div class="summary-box">
           <div class="summary-row">
-            <span>Max Allowable Offer (70% − Repairs − Fee):</span>
+            <span>Max Allowable Offer (MAO):</span>
             <span class="mao-highlight" id="liveMAO">$0</span>
           </div>
         </div>
 
-        <textarea id="notes" rows="2" placeholder="Field notes (tax delinquency, code violation, inherited property, corner lot)..."></textarea>
+        <textarea id="notes" rows="2" placeholder="Tax delinquency, estate/probate, condition notes..."></textarea>
 
-        <button class="primary-btn" id="gpsBtn" onclick="captureGPSLead()">
-          📍 Drop & Sync GPS Lead
-        </button>
-        <div id="status" class="status-text">Ready. Park safely and drop a lead or enter an address.</div>
+        <button class="primary-btn" id="gpsBtn" onclick="captureGPSLead()">Save & Sync Lead</button>
+        <div id="status" class="status-text">Ready to capture.</div>
       </div>
-    </section>
+    </main>
 
-    <!-- 3. PIPELINE PAGE (#/pipeline) -->
-    <section id="view-pipeline" class="route-view hidden">
+    <!-- TAB 3: PIPELINE (#/pipeline) -->
+    <main id="view-pipeline" class="route-view hidden">
       <div class="stage-pills" id="stagePills">
         <button class="pill-tab active" data-stage="ALL" onclick="selectStageFilter('ALL')">All</button>
         <button class="pill-tab" data-stage="New" onclick="selectStageFilter('New')">New</button>
         <button class="pill-tab" data-stage="Skip Traced" onclick="selectStageFilter('Skip Traced')">Skip Traced</button>
         <button class="pill-tab" data-stage="Contacted" onclick="selectStageFilter('Contacted')">Contacted</button>
         <button class="pill-tab" data-stage="Offer Made" onclick="selectStageFilter('Offer Made')">Offer Made</button>
-        <button class="pill-tab" data-stage="Under Contract" onclick="selectStageFilter('Under Contract')">Under Contract</button>
+        <button class="pill-tab" data-stage="Under Contract" onclick="selectStageFilter('Under Contract')">Contract</button>
         <button class="pill-tab" data-stage="Dead" onclick="selectStageFilter('Dead')">Dead</button>
       </div>
 
-      <div class="toolbar">
-        <input type="text" id="searchInput" placeholder="Search address, owner, or notes..." oninput="renderLeads()" />
-        <select id="statusFilter" onchange="syncStagePillsFromSelect(); renderLeads();">
-          <option value="ALL">All Statuses</option>
-          <option value="New">New</option>
-          <option value="Skip Traced">Skip Traced</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Offer Made">Offer Made</option>
-          <option value="Under Contract">Under Contract</option>
-          <option value="Dead">Dead</option>
-        </select>
-      </div>
-
-      <div class="actions-row">
-        <button class="secondary-btn" onclick="fetchLeads()">🔄 Sync Now</button>
-        <button class="secondary-btn" onclick="exportCSV()">⬇️ Export CSV</button>
-      </div>
-
+      <input type="text" id="searchInput" placeholder="Search address, owner, or notes..." oninput="renderLeads()" />
       <div id="leadsList"></div>
-    </section>
+    </main>
 
-    <!-- 4. DEDICATED APR & DEAL CALCULATOR PAGE (#/calculator) -->
-    <section id="view-calculator" class="route-view hidden">
+    <!-- TAB 4: APR & DEAL CALCULATOR (#/calculator) -->
+    <main id="view-calculator" class="route-view hidden">
       <div class="card">
-        <h2>Loan & Hard Money APR Calculator</h2>
-        <p class="lead-meta">Calculate monthly payments, total interest, and effective APR including origination points/fees.</p>
-
+        <h2>Loan & Hard Money APR</h2>
         <div class="grid-2">
           <div>
             <label for="aprPrincipal">Loan Principal ($)</label>
             <input type="number" id="aprPrincipal" value="75000" oninput="runAPRCalculator()" />
           </div>
           <div>
-            <label for="aprRate">Nominal Interest Rate (APR %)</label>
+            <label for="aprRate">Nominal APR (%)</label>
             <input type="number" id="aprRate" step="0.1" value="12.0" oninput="runAPRCalculator()" />
           </div>
         </div>
-
         <div class="grid-2">
           <div>
             <label for="aprMonths">Term (Months)</label>
             <input type="number" id="aprMonths" value="12" oninput="runAPRCalculator()" />
           </div>
           <div>
-            <label for="aprFees">Lender Points / Origination Fees ($)</label>
+            <label for="aprFees">Points / Fees ($)</label>
             <input type="number" id="aprFees" value="1500" oninput="runAPRCalculator()" />
           </div>
         </div>
-
         <div class="summary-box">
-          <div class="summary-row">
-            <span>Monthly Principal & Interest:</span>
-            <span class="sky-highlight" id="aprMonthlyPmt">$0</span>
-          </div>
-          <div class="summary-row">
-            <span>Total Interest Over Term:</span>
-            <span id="aprTotalInterest">$0</span>
-          </div>
-          <div class="summary-row">
-            <span>Total Cost (Interest + Points/Fees):</span>
-            <span id="aprTotalCost">$0</span>
-          </div>
-          <div class="summary-row">
-            <span>Effective APR (Incl. Fees):</span>
-            <span class="mao-highlight" id="aprEffective">0.00%</span>
-          </div>
+          <div class="summary-row"><span>Monthly Payment:</span><span class="sky-highlight" id="aprMonthlyPmt">$0</span></div>
+          <div class="summary-row"><span>Total Interest:</span><span id="aprTotalInterest">$0</span></div>
+          <div class="summary-row"><span>Total Cost (Int + Fees):</span><span id="aprTotalCost">$0</span></div>
+          <div class="summary-row"><span>Effective APR:</span><span class="mao-highlight" id="aprEffective">0.00%</span></div>
         </div>
       </div>
 
       <div class="card">
-        <h2>70% Rule Deal Underwriter (Connected to Pipeline)</h2>
+        <h2>70% Rule Deal Saver</h2>
         <label for="calcAddress">Property Address</label>
         <input type="text" id="calcAddress" placeholder="e.g., 518 E Innes St, Salisbury, NC" />
-
         <div class="grid-3">
-          <div>
-            <label for="calcArv">Est. ARV ($)</label>
-            <input type="number" id="calcArv" placeholder="140000" oninput="runDealCalculator()" />
-          </div>
-          <div>
-            <label for="calcRepairs">Est. Repairs ($)</label>
-            <input type="number" id="calcRepairs" placeholder="20000" oninput="runDealCalculator()" />
-          </div>
-          <div>
-            <label for="calcFee">Assignment Fee ($)</label>
-            <input type="number" id="calcFee" value="8000" oninput="runDealCalculator()" />
-          </div>
+          <div><label for="calcArv">ARV ($)</label><input type="number" id="calcArv" oninput="runDealCalculator()" /></div>
+          <div><label for="calcRepairs">Repairs ($)</label><input type="number" id="calcRepairs" oninput="runDealCalculator()" /></div>
+          <div><label for="calcFee">Fee ($)</label><input type="number" id="calcFee" value="8000" oninput="runDealCalculator()" /></div>
         </div>
-
         <div class="summary-box">
-          <div class="summary-row">
-            <span>70% ARV − Repairs (Buyer Ceiling):</span>
-            <span id="calcBuyerMax">$0</span>
-          </div>
-          <div class="summary-row">
-            <span>Your Max Allowable Offer (MAO):</span>
-            <span class="mao-highlight" id="calcMAO">$0</span>
-          </div>
-          <div class="summary-row">
-            <span>Est. Monthly Carry at Current APR:</span>
-            <span id="calcCarryEst">$0/mo</span>
-          </div>
+          <div class="summary-row"><span>Buyer Ceiling (70% - Rep):</span><span id="calcBuyerMax">$0</span></div>
+          <div class="summary-row"><span>Your MAO:</span><span class="mao-highlight" id="calcMAO">$0</span></div>
+          <div class="summary-row"><span>Est. Monthly Carry:</span><span id="calcCarryEst">$0/mo</span></div>
         </div>
-
-        <button class="primary-btn" onclick="saveDealFromCalculator()">
-          💾 Save Deal to Pipeline
-        </button>
+        <button class="primary-btn" onclick="saveDealFromCalculator()">Save Deal to Pipeline</button>
         <div id="calcStatus" class="status-text"></div>
       </div>
-    </section>
+    </main>
+
+    <!-- TAB 5: PROFILE & SETTINGS (#/profile) -->
+    <main id="view-profile" class="route-view hidden">
+      <div class="card" style="text-align:center;">
+        <div class="avatar-circle" id="profileAvatar">DS</div>
+        <h2 id="profileEmail" style="margin-bottom:4px;">Account</h2>
+        <div class="lead-meta">DealScout Cloud Pro • Active Session</div>
+      </div>
+
+      <div class="card">
+        <div class="settings-row">
+          <span>Cloud Sync</span>
+          <button class="secondary-btn" style="flex:none; padding:6px 14px;" onclick="fetchLeads()">Sync Now</button>
+        </div>
+        <div class="settings-row">
+          <span>Export All Leads</span>
+          <button class="secondary-btn" style="flex:none; padding:6px 14px;" onclick="exportCSV()">Download CSV</button>
+        </div>
+        <div class="settings-row">
+          <span>Default Target Fee</span>
+          <span style="font-weight:700; color:var(--accent);">$8,000</span>
+        </div>
+      </div>
+
+      <button class="logout-pill-btn" onclick="handleLogout()">Log Out</button>
+    </main>
+
+    <!-- FIXED BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav" aria-label="Bottom Navigation">
+      <a class="nav-item active" href="#/dashboard" data-route="/dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" href="#/capture" data-route="/capture">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 7 11.5 7.3 11.8a1 1 0 0 0 1.4 0C13 21.5 20 15.4 20 10a8 8 0 0 0-8-8z"/></svg>
+        <span>Scout</span>
+      </a>
+      <a class="nav-item" href="#/pipeline" data-route="/pipeline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span>Pipeline</span>
+      </a>
+      <a class="nav-item" href="#/calculator" data-route="/calculator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>
+        <span>APR Calc</span>
+      </a>
+      <a class="nav-item" href="#/profile" data-route="/profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://czdejfkeuuvcoaiqlvfd.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_l71R6MOvCOMFd9D8P9tP5w_5SRk-jY8';
 
-    const sb = window.supabase
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let cachedLeads = [];
     let currentUser = null;
-    let stageFilter = 'ALL';
+    let activeStage = 'ALL';
 
-    const text = (id, value) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = value;
+    const ROUTE_META = {
+      '/dashboard': { title: 'Home', sub: 'Pipeline & Daily Command' },
+      '/capture': { title: 'Scout Lead', sub: 'GPS Pin & Quick Underwriting' },
+      '/pipeline': { title: 'Pipeline', sub: 'Segmented Seller Leads' },
+      '/calculator': { title: 'APR & Deal Calc', sub: 'Financing & 70% Rule Math' },
+      '/profile': { title: 'My Profile', sub: 'Account, Sync & Exports' }
     };
-
-    function formatMoney(value) {
-      const number = Number(value);
-      return Number.isFinite(number) ? `$${number.toLocaleString()}` : '$0';
-    }
 
     function navigateTo(route) {
       const normalized = route.startsWith('/') ? route : `/${route}`;
-      window.location.hash = normalized;
+      window.location.hash = `#${normalized}`;
       handleRoute();
     }
 
     function getCurrentRoute() {
       const raw = (window.location.hash || '#/dashboard').replace(/^#/, '');
-      const valid = ['/login', '/dashboard', '/capture', '/pipeline', '/calculator'];
-      return valid.includes(raw) ? raw : '/dashboard';
+      return ROUTE_META[raw] ? raw : (raw === '/login' ? '/login' : '/dashboard');
     }
 
     function handleRoute() {
@@ -644,94 +592,118 @@
 
       loginEl.classList.add('hidden');
       appEl.classList.remove('hidden');
-      document.querySelectorAll('.route-view').forEach((el) => {
-        el.classList.toggle('hidden', el.id !== `view-${route.slice(1)}`);
-      });
-      document.querySelectorAll('.tab-btn').forEach((el) => {
-        el.classList.toggle('active', el.dataset.route === route);
+
+      document.getElementById('pageTitle').textContent = ROUTE_META[route].title;
+      document.getElementById('pageSubtitle').textContent = ROUTE_META[route].sub;
+
+      document.querySelectorAll('.route-view').forEach((el) => el.classList.add('hidden'));
+      const activeSection = document.getElementById(`view-${route.slice(1)}`);
+      if (activeSection) activeSection.classList.remove('hidden');
+
+      document.querySelectorAll('.bottom-nav .nav-item').forEach((item) => {
+        item.classList.toggle('active', item.dataset.route === route);
       });
 
-      if (route === '/pipeline') renderLeads();
-      if (route === '/dashboard') renderDashboardTopLeads();
       if (route === '/calculator') {
         runAPRCalculator();
         runDealCalculator();
       }
-      if (route === '/capture') updateCaptureMAO();
     }
 
-    async function initAuth() {
-      if (!sb) {
-        text('authStatus', 'Supabase client could not load. Check your network connection.');
-        return;
-      }
-      const { data, error } = await sb.auth.getSession();
-      if (error) text('authStatus', `Authentication error: ${error.message}`);
-      setCurrentUser(data?.session?.user || null);
-      sb.auth.onAuthStateChange((_event, session) => setCurrentUser(session?.user || null));
-    }
+    window.addEventListener('hashchange', handleRoute);
 
-    function setCurrentUser(user) {
-      currentUser = user;
-      text('userEmailLabel', user ? `👤 ${user.email || ''}` : '');
-      handleRoute();
-      if (user) fetchLeads();
-    }
-
-    async function handleLogin() {
-      if (!sb) return;
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      text('authStatus', 'Signing in...');
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) text('authStatus', `❌ ${error.message}`);
-    }
-
-    async function handleSignUp() {
-      if (!sb) return;
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      text('authStatus', 'Creating account...');
-      const { error } = await sb.auth.signUp({ email, password });
-      text('authStatus', error
-        ? `❌ ${error.message}`
-        : '✅ Account created. Check your email or log in.');
-    }
-
-    async function handleLogout() {
-      if (sb) await sb.auth.signOut();
-    }
-
-    async function fetchLeads() {
-      if (!sb || !currentUser) return;
-      text('globalSyncStatus', 'Syncing...');
-      const { data, error } = await sb
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) {
-        text('globalSyncStatus', `Sync error: ${error.message}`);
-        text('status', `❌ Sync error: ${error.message}`);
-        return;
-      }
-      cachedLeads = data || [];
-      text('globalSyncStatus', `Synced ${cachedLeads.length} lead(s)`);
-      text('status', `✅ Synced ${cachedLeads.length} lead(s) from cloud.`);
-      updateDashboardStats();
-      renderLeads();
-      renderDashboardTopLeads();
-    }
-
-    function calculateCaptureMAO() {
-      const arv = Number(document.getElementById('arvInput')?.value) || 0;
-      const repairs = Number(document.getElementById('repairsInput')?.value) || 0;
-      const fee = Number(document.getElementById('feeInput')?.value) || 0;
-      return arv ? Math.max(0, Math.round(arv * 0.7 - repairs - fee)) : null;
+    function calculateMAO() {
+      const arv = Number(document.getElementById('arvInput').value) || 0;
+      const repairs = Number(document.getElementById('repairsInput').value) || 0;
+      const fee = Number(document.getElementById('feeInput').value) || 0;
+      if (!arv) return null;
+      return Math.max(0, Math.round(arv * 0.7 - repairs - fee));
     }
 
     function updateCaptureMAO() {
-      const mao = calculateCaptureMAO();
-      text('liveMAO', mao === null ? '$0' : formatMoney(mao));
+      const mao = calculateMAO();
+      document.getElementById('liveMAO').textContent = mao === null ? '$0' : `$${mao.toLocaleString()}`;
+    }
+
+    function runAPRCalculator() {
+      const P = Number(document.getElementById('aprPrincipal').value) || 0;
+      const nominalApr = Number(document.getElementById('aprRate').value) || 0;
+      const n = Math.max(1, Number(document.getElementById('aprMonths').value) || 1);
+      const fees = Number(document.getElementById('aprFees').value) || 0;
+      const r = (nominalApr / 100) / 12;
+
+      const monthly = r > 0
+        ? (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
+        : (P / n);
+      const totalInterest = Math.max(0, monthly * n - P);
+      const totalCost = totalInterest + fees;
+      const netProceeds = Math.max(1, P - fees);
+      const effectiveApr = ((totalCost / netProceeds) / (n / 12)) * 100;
+
+      document.getElementById('aprMonthlyPmt').textContent = `$${Math.round(monthly).toLocaleString()}/mo`;
+      document.getElementById('aprTotalInterest').textContent = `$${Math.round(totalInterest).toLocaleString()}`;
+      document.getElementById('aprTotalCost').textContent = `$${Math.round(totalCost).toLocaleString()}`;
+      document.getElementById('aprEffective').textContent = `${effectiveApr.toFixed(2)}%`;
+      runDealCalculator();
+    }
+
+    function runDealCalculator() {
+      const arv = Number(document.getElementById('calcArv').value) || 0;
+      const repairs = Number(document.getElementById('calcRepairs').value) || 0;
+      const fee = Number(document.getElementById('calcFee').value) || 0;
+      const nominalApr = Number(document.getElementById('aprRate').value) || 0;
+
+      const buyerMax = Math.max(0, Math.round(arv * 0.7 - repairs));
+      const mao = Math.max(0, buyerMax - fee);
+      const carryMo = Math.round(((mao + repairs) * (nominalApr / 100)) / 12);
+
+      document.getElementById('calcBuyerMax').textContent = `$${buyerMax.toLocaleString()}`;
+      document.getElementById('calcMAO').textContent = `$${mao.toLocaleString()}`;
+      document.getElementById('calcCarryEst').textContent = `$${carryMo.toLocaleString()}/mo`;
+      return { arv, repairs, fee, mao };
+    }
+
+    function loadLeadIntoCalculator(id) {
+      const lead = cachedLeads.find((l) => l.id === id);
+      if (!lead) return;
+      document.getElementById('calcAddress').value = lead.address || '';
+      document.getElementById('calcArv').value = lead.estimated_arv || '';
+      document.getElementById('calcRepairs').value = '';
+      document.getElementById('aprPrincipal').value = lead.max_offer || lead.estimated_arv || 75000;
+      runAPRCalculator();
+      navigateTo('/calculator');
+    }
+
+    async function saveDealFromCalculator() {
+      const address = document.getElementById('calcAddress').value.trim();
+      const statusEl = document.getElementById('calcStatus');
+      if (!address) {
+        statusEl.textContent = 'Enter a property address first.';
+        return;
+      }
+      const { arv, repairs, fee, mao } = runDealCalculator();
+      const effApr = document.getElementById('aprEffective').textContent;
+      const { data, error } = await sb
+        .from('leads')
+        .insert([{
+          address,
+          tags: ['Underwritten'],
+          notes: `Calculator save — Repairs est: $${repairs.toLocaleString()}, Fee: $${fee.toLocaleString()}, Effective APR: ${effApr}`,
+          estimated_arv: arv || null,
+          max_offer: mao,
+          motivation_score: 50,
+          status: 'New'
+        }])
+        .select();
+
+      if (error) {
+        statusEl.textContent = `❌ ${error.message}`;
+        return;
+      }
+      cachedLeads = [...(data || []), ...cachedLeads];
+      updateDashboardStats();
+      renderLeads();
+      statusEl.textContent = `✅ Saved ${address} to Pipeline.`;
     }
 
     function computeMotivationScore(tags, notes) {
@@ -740,411 +712,299 @@
         score += Number(cb.dataset.pts || 10);
       });
       const lower = (notes || '').toLowerCase();
-      if (/(absentee|out of state)/.test(lower)) score += 10;
-      if (/(probate|inherited|tax)/.test(lower)) score += 12;
-      if (/(motivated|distressed)/.test(lower)) score += 10;
+      if (lower.includes('absentee') || lower.includes('out of state')) score += 10;
+      if (lower.includes('probate') || lower.includes('estate') || lower.includes('tax')) score += 12;
       return Math.min(100, score);
     }
 
-    async function resolveCoordinates(manualAddress) {
-      if (!navigator.geolocation) {
-        return { lat: null, lon: null, address: manualAddress || 'Manual Lead (No GPS)' };
+    function formatMoney(val) {
+      if (val == null || Number.isNaN(Number(val))) return '—';
+      return `$${Number(val).toLocaleString()}`;
+    }
+
+    async function initAuth() {
+      const { data: { session } } = await sb.auth.getSession();
+      toggleViews(session);
+      sb.auth.onAuthStateChange((_event, session) => toggleViews(session));
+    }
+
+    function toggleViews(session) {
+      currentUser = session?.user || null;
+      if (currentUser) {
+        const email = currentUser.email || 'User';
+        document.getElementById('profileEmail').textContent = email;
+        document.getElementById('profileAvatar').textContent = email.slice(0, 2).toUpperCase();
+        fetchLeads();
+      } else {
+        cachedLeads = [];
+        updateDashboardStats();
       }
+      handleRoute();
+    }
+
+    async function handleSignUp() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const status = document.getElementById('authStatus');
+      status.textContent = 'Creating account...';
+      const { error } = await sb.auth.signUp({ email, password });
+      status.textContent = error ? `❌ ${error.message}` : '✅ Account created! Click Sign In.';
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const status = document.getElementById('authStatus');
+      status.textContent = 'Signing in...';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) status.textContent = `❌ ${error.message}`;
+    }
+
+    async function handleLogout() {
+      await sb.auth.signOut();
+      window.location.hash = '#/login';
+    }
+
+    async function fetchLeads() {
+      const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
+      if (!error) {
+        cachedLeads = data || [];
+        updateDashboardStats();
+        renderLeads();
+      }
+    }
+
+    async function resolveCoordinates(manualAddr) {
+      if (!navigator.geolocation) return { lat: null, lon: null, address: manualAddr || 'Manual Lead' };
       return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const lat = Number(position.coords.latitude.toFixed(6));
-            const lon = Number(position.coords.longitude.toFixed(6));
-            let address = manualAddress || `${lat}, ${lon}`;
-            if (!manualAddress) {
-              text('status', '🗺️ Resolving street address...');
+          async (pos) => {
+            const lat = Number(pos.coords.latitude.toFixed(6));
+            const lon = Number(pos.coords.longitude.toFixed(6));
+            let address = manualAddr || `${lat}, ${lon}`;
+            if (!manualAddr) {
               try {
-                const response = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
-                  { headers: { Accept: 'application/json' } }
-                );
-                const data = await response.json();
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, { headers: { Accept: 'application/json' } });
+                const data = await res.json();
                 if (data?.address) {
                   const street = `${data.address.house_number || ''} ${data.address.road || ''}`.trim();
                   const city = data.address.city || data.address.town || data.address.village || '';
-                  address = [street, city, data.address.postcode].filter(Boolean).join(', ') || address;
+                  address = [street, city, data.address.postcode || ''].filter(Boolean).join(', ') || address;
                 }
-              } catch (error) {
-                console.warn('Reverse geocode fallback:', error);
-              }
+              } catch (_e) {}
             }
             resolve({ lat, lon, address });
           },
-          () => resolve({
-            lat: null,
-            lon: null,
-            address: manualAddress || 'GPS Unavailable - Enter Address'
-          }),
-          { enableHighAccuracy: true, timeout: 12000 }
+          () => resolve({ lat: null, lon: null, address: manualAddr || 'GPS Unavailable' }),
+          { enableHighAccuracy: true, timeout: 10000 }
         );
       });
     }
 
     async function captureGPSLead() {
-      if (!sb || !currentUser) {
-        text('status', '❌ Sign in before saving leads.');
-        return;
-      }
-      const button = document.getElementById('gpsBtn');
-      const manualAddress = document.getElementById('manualAddress').value.trim();
-      button.disabled = true;
-      text('status', manualAddress ? '☁️ Saving lead...' : '🛰️ Locking GPS...');
-      const geo = await resolveCoordinates(manualAddress);
+      const btn = document.getElementById('gpsBtn');
+      const status = document.getElementById('status');
+      const manualAddr = document.getElementById('manualAddress').value.trim();
+
+      btn.disabled = true;
+      status.textContent = manualAddr ? 'Saving lead...' : 'Locking GPS...';
+
+      const geo = await resolveCoordinates(manualAddr);
       const tags = Array.from(document.querySelectorAll('#tagsGroup input:checked')).map((cb) => cb.value);
       const notes = document.getElementById('notes').value.trim();
       const ownerName = document.getElementById('ownerName').value.trim();
       const ownerPhone = document.getElementById('ownerPhone').value.trim();
       const arv = Number(document.getElementById('arvInput').value) || null;
-      const maxOffer = calculateCaptureMAO();
+      const mao = calculateMAO();
       const motivationScore = computeMotivationScore(tags, notes);
-      text('status', '☁️ Writing to Supabase...');
-      const { data, error } = await sb.from('leads').insert([{
-        address: geo.address,
-        lat: geo.lat,
-        lon: geo.lon,
-        tags,
-        notes,
-        owner_name: ownerName,
-        owner_phone: ownerPhone,
-        estimated_arv: arv,
-        max_offer: maxOffer,
-        motivation_score: motivationScore,
-        status: 'New'
-      }]).select();
+
+      const { data, error } = await sb
+        .from('leads')
+        .insert([{
+          address: geo.address,
+          lat: geo.lat,
+          lon: geo.lon,
+          tags,
+          notes,
+          owner_name: ownerName,
+          owner_phone: ownerPhone,
+          estimated_arv: arv,
+          max_offer: mao,
+          motivation_score: motivationScore,
+          status: 'New'
+        }])
+        .select();
+
       if (error) {
-        text('status', `❌ Save error: ${error.message}`);
+        status.textContent = `❌ ${error.message}`;
       } else {
         cachedLeads = [...(data || []), ...cachedLeads];
         updateDashboardStats();
         renderLeads();
-        renderDashboardTopLeads();
-        text('status', `✅ Saved: ${geo.address} (Score: ${motivationScore}/100)`);
+        status.textContent = `✅ Saved: ${geo.address}`;
         document.getElementById('manualAddress').value = '';
         document.getElementById('notes').value = '';
         document.getElementById('ownerName').value = '';
         document.getElementById('ownerPhone').value = '';
         document.getElementById('arvInput').value = '';
         document.getElementById('repairsInput').value = '';
-        document.querySelectorAll('#tagsGroup input:checked').forEach((cb) => { cb.checked = false; });
         updateCaptureMAO();
+        document.querySelectorAll('#tagsGroup input:checked').forEach((cb) => { cb.checked = false; });
       }
-      button.disabled = false;
-    }
-
-    async function updateLeadStatus(id, newStatus) {
-      if (!sb) return;
-      const { error } = await sb.from('leads').update({ status: newStatus }).eq('id', id);
-      if (error) {
-        text('status', `❌ Status update error: ${error.message}`);
-        return;
-      }
-      cachedLeads = cachedLeads.map((lead) =>
-        lead.id === id ? { ...lead, status: newStatus } : lead
-      );
-      updateDashboardStats();
-      renderLeads();
-      renderDashboardTopLeads();
-    }
-
-    async function deleteLead(id) {
-      if (!sb) return;
-      const { error } = await sb.from('leads').delete().eq('id', id);
-      if (error) {
-        text('status', `❌ Delete error: ${error.message}`);
-        return;
-      }
-      cachedLeads = cachedLeads.filter((lead) => lead.id !== id);
-      updateDashboardStats();
-      renderLeads();
-      renderDashboardTopLeads();
-    }
-
-    function updateDashboardStats() {
-      text('leadCount', `${cachedLeads.length} ${cachedLeads.length === 1 ? 'Lead' : 'Leads'}`);
-      text('hotCount', String(cachedLeads.filter((lead) => (lead.motivation_score || 0) >= 70).length));
-      const totalMAO = cachedLeads
-        .filter((lead) => lead.status !== 'Dead')
-        .reduce((sum, lead) => sum + (Number(lead.max_offer) || 0), 0);
-      text('pipelineMAO', formatMoney(totalMAO));
-      text('activeCount', String(cachedLeads.filter((lead) =>
-        lead.status && lead.status !== 'Dead'
-      ).length));
-      const average = cachedLeads.length
-        ? Math.round(cachedLeads.reduce((sum, lead) => sum + (Number(lead.motivation_score) || 0), 0) / cachedLeads.length)
-        : 0;
-      text('avgScore', String(average));
+      btn.disabled = false;
     }
 
     function selectStageFilter(stage) {
-      stageFilter = stage;
-      const statusFilter = document.getElementById('statusFilter');
-      if (statusFilter) statusFilter.value = stage;
-      document.querySelectorAll('.pill-tab').forEach((pill) => {
-        pill.classList.toggle('active', pill.dataset.stage === stage);
+      activeStage = stage;
+      document.querySelectorAll('#stagePills .pill-tab').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.stage === stage);
       });
       renderLeads();
     }
 
-    function syncStagePillsFromSelect() {
-      const selected = document.getElementById('statusFilter')?.value || 'ALL';
-      stageFilter = selected;
-      document.querySelectorAll('.pill-tab').forEach((pill) => {
-        pill.classList.toggle('active', pill.dataset.stage === selected);
-      });
+    async function updateLeadStatus(id, newStatus) {
+      const { error } = await sb.from('leads').update({ status: newStatus }).eq('id', id);
+      if (!error) {
+        cachedLeads = cachedLeads.map((l) => (l.id === id ? { ...l, status: newStatus } : l));
+        updateDashboardStats();
+        renderLeads();
+      }
     }
 
-    function renderDashboardTopLeads() {
-      const container = document.getElementById('dashboardTopLeads');
-      if (!container) return;
-      container.replaceChildren();
-      const top = [...cachedLeads]
-        .filter((lead) => lead.status !== 'Dead')
-        .sort((a, b) => (Number(b.motivation_score) || 0) - (Number(a.motivation_score) || 0))
-        .slice(0, 5);
-      if (!top.length) {
-        container.textContent = 'No leads yet.';
-        return;
+    async function deleteLead(id) {
+      const { error } = await sb.from('leads').delete().eq('id', id);
+      if (!error) {
+        cachedLeads = cachedLeads.filter((l) => l.id !== id);
+        updateDashboardStats();
+        renderLeads();
       }
-      top.forEach((lead) => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)';
-        const address = document.createElement('span');
-        address.textContent = lead.address || 'Unknown address';
-        const score = document.createElement('strong');
-        score.className = 'mao-highlight';
-        score.textContent = String(Number(lead.motivation_score) || 0);
-        row.append(address, score);
-        container.appendChild(row);
-      });
+    }
+
+    function updateDashboardStats() {
+      const count = cachedLeads.length;
+      document.getElementById('leadCount').textContent = `${count} ${count === 1 ? 'Lead' : 'Leads'}`;
+      document.getElementById('hotCount').textContent = String(cachedLeads.filter((l) => (l.motivation_score || 0) >= 70).length);
+      const totalMAO = cachedLeads.filter((l) => l.status !== 'Dead').reduce((s, l) => s + (Number(l.max_offer) || 0), 0);
+      document.getElementById('pipelineMAO').textContent = `$${totalMAO.toLocaleString()}`;
+      const active = cachedLeads.filter((l) => l.status && l.status !== 'Dead');
+      document.getElementById('activeCount').textContent = String(active.length);
+      const avg = active.length ? Math.round(active.reduce((s, l) => s + (Number(l.motivation_score) || 20), 0) / active.length) : 0;
+      document.getElementById('avgScore').textContent = String(avg);
+
+      const topContainer = document.getElementById('dashboardTopLeads');
+      const top = active.slice(0, 3);
+      topContainer.innerHTML = top.length
+        ? top.map((l) => `<div class="summary-row"><span>${l.address}</span><strong style="color:var(--accent);">${formatMoney(l.max_offer)}</strong></div>`).join('')
+        : 'No leads yet — tap + Drop Lead below.';
     }
 
     function renderLeads() {
       const list = document.getElementById('leadsList');
-      if (!list) return;
       const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
-      const statusFilter = document.getElementById('statusFilter')?.value || stageFilter;
-      stageFilter = statusFilter;
+
       const filtered = cachedLeads.filter((lead) => {
-        const matchesStatus = statusFilter === 'ALL' || (lead.status || 'New') === statusFilter;
-        const haystack = [
-          lead.address, lead.notes, lead.owner_name, lead.owner_phone,
-          ...(Array.isArray(lead.tags) ? lead.tags : [])
-        ].filter(Boolean).join(' ').toLowerCase();
-        return matchesStatus && (!query || haystack.includes(query));
+        const matchesStage = activeStage === 'ALL' || (lead.status || 'New') === activeStage;
+        const haystack = [lead.address, lead.notes, lead.owner_name, lead.owner_phone, ...(Array.isArray(lead.tags) ? lead.tags : [])].join(' ').toLowerCase();
+        return matchesStage && (!query || haystack.includes(query));
       });
+
       list.replaceChildren();
       if (!filtered.length) {
         const empty = document.createElement('div');
-        empty.className = 'lead-meta';
-        empty.style.cssText = 'text-align:center;padding:18px';
-        empty.textContent = 'No matching leads yet.';
+        empty.className = 'card lead-meta';
+        empty.style.textAlign = 'center';
+        empty.textContent = 'No leads in this stage yet.';
         list.appendChild(empty);
         return;
       }
+
       const statuses = ['New', 'Skip Traced', 'Contacted', 'Offer Made', 'Under Contract', 'Dead'];
       filtered.forEach((lead) => {
         const item = document.createElement('div');
         item.className = 'lead-item';
+
         const top = document.createElement('div');
         top.className = 'lead-top';
-        const address = document.createElement('div');
-        address.className = 'lead-address';
-        address.textContent = lead.address || 'Unknown address';
+        const addr = document.createElement('div');
+        addr.className = 'lead-address';
+        addr.textContent = lead.address || 'Unknown address';
+
         const score = Number(lead.motivation_score) || 20;
         const pill = document.createElement('span');
         pill.className = `pill ${score >= 70 ? 'pill-hot' : score >= 45 ? 'pill-warm' : 'pill-cool'}`;
-        pill.textContent = `Score ${score}`;
-        top.append(address, pill);
+        pill.textContent = `${score} pts`;
+        top.append(addr, pill);
         item.appendChild(top);
 
-        const metaParts = [];
-        if (lead.created_at) metaParts.push(new Date(lead.created_at).toLocaleString());
-        if (lead.lat != null && lead.lon != null) metaParts.push(`${lead.lat}, ${lead.lon}`);
-        if (lead.owner_name) metaParts.push(`Owner: ${lead.owner_name}`);
-        if (lead.owner_phone) metaParts.push(`Tel: ${lead.owner_phone}`);
         const meta = document.createElement('div');
         meta.className = 'lead-meta';
-        meta.textContent = metaParts.join(' • ');
+        meta.textContent = [lead.owner_name, lead.owner_phone].filter(Boolean).join(' • ') || 'No owner contact saved yet';
         item.appendChild(meta);
 
         if (Array.isArray(lead.tags) && lead.tags.length) {
-          const tags = document.createElement('div');
-          tags.className = 'lead-tags';
-          tags.textContent = lead.tags.join(' • ');
-          item.appendChild(tags);
+          const tagsEl = document.createElement('div');
+          tagsEl.className = 'lead-tags';
+          tagsEl.textContent = lead.tags.join(' • ');
+          item.appendChild(tagsEl);
         }
 
-        const underwriting = document.createElement('div');
-        underwriting.className = 'lead-uw';
-        for (const [label, value] of [
-          ['ARV', lead.estimated_arv == null ? '—' : formatMoney(lead.estimated_arv)],
-          ['MAO', lead.max_offer == null ? '—' : formatMoney(lead.max_offer)],
-          ['Stage', lead.status || 'New']
-        ]) {
-          const span = document.createElement('span');
-          span.textContent = `${label}: `;
-          const strong = document.createElement('strong');
-          strong.textContent = value;
-          span.appendChild(strong);
-          underwriting.appendChild(span);
-        }
-        item.appendChild(underwriting);
+        const uw = document.createElement('div');
+        uw.className = 'lead-uw';
+        uw.innerHTML = `<span>ARV: <strong>${formatMoney(lead.estimated_arv)}</strong></span><span>MAO: <strong style="color:var(--accent);">${formatMoney(lead.max_offer)}</strong></span>`;
+        item.appendChild(uw);
 
-        if (lead.notes) {
-          const notes = document.createElement('div');
-          notes.className = 'lead-meta';
-          notes.textContent = lead.notes;
-          item.appendChild(notes);
-        }
         const footer = document.createElement('div');
         footer.className = 'lead-footer';
         const links = document.createElement('div');
         links.className = 'lead-links';
-        const mapQuery = lead.lat != null && lead.lon != null
-          ? `${lead.lat},${lead.lon}`
-          : encodeURIComponent(lead.address || '');
-        const mapLink = document.createElement('a');
-        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
-        mapLink.target = '_blank';
-        mapLink.rel = 'noopener';
-        mapLink.textContent = 'Maps ↗';
-        links.appendChild(mapLink);
+        const q = lead.lat != null && lead.lon != null ? `${lead.lat},${lead.lon}` : encodeURIComponent(lead.address || '');
+        links.innerHTML = `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Maps ↗</a><a href="https://www.truepeoplesearch.com/" target="_blank" rel="noopener">Skip ↗</a>`;
+
+        const calcBtn = document.createElement('button');
+        calcBtn.className = 'calc-link-btn';
+        calcBtn.textContent = 'APR Calc';
+        calcBtn.onclick = () => loadLeadIntoCalculator(lead.id);
+        links.appendChild(calcBtn);
+
         const controls = document.createElement('div');
-        controls.style.cssText = 'display:flex;align-items:center;gap:10px';
-        const select = document.createElement('select');
-        select.className = 'mini-select';
-        statuses.forEach((status) => {
-          const option = document.createElement('option');
-          option.value = status;
-          option.textContent = status;
-          option.selected = (lead.status || 'New') === status;
-          select.appendChild(option);
+        controls.style.display = 'flex';
+        controls.style.alignItems = 'center';
+        controls.style.gap = '8px';
+
+        const sel = document.createElement('select');
+        sel.className = 'mini-select';
+        statuses.forEach((st) => {
+          const opt = document.createElement('option');
+          opt.value = st;
+          opt.textContent = st;
+          if ((lead.status || 'New') === st) opt.selected = true;
+          sel.appendChild(opt);
         });
-        select.onchange = () => updateLeadStatus(lead.id, select.value);
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'del-btn';
-        deleteButton.textContent = 'Delete';
-        deleteButton.onclick = () => deleteLead(lead.id);
-        controls.append(select, deleteButton);
+        sel.onchange = () => updateLeadStatus(lead.id, sel.value);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del-btn';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => deleteLead(lead.id);
+
+        controls.append(sel, delBtn);
         footer.append(links, controls);
         item.appendChild(footer);
         list.appendChild(item);
       });
     }
 
-    function runAPRCalculator() {
-      const principal = Math.max(0, Number(document.getElementById('aprPrincipal')?.value) || 0);
-      const nominalAPR = Math.max(0, Number(document.getElementById('aprRate')?.value) || 0) / 100;
-      const months = Math.max(1, Number(document.getElementById('aprMonths')?.value) || 1);
-      const fees = Math.max(0, Number(document.getElementById('aprFees')?.value) || 0);
-      const monthlyRate = nominalAPR / 12;
-      let monthlyPayment = 0;
-      let totalInterest = 0;
-      if (principal > 0) {
-        monthlyPayment = monthlyRate === 0
-          ? principal / months
-          : principal * monthlyRate * Math.pow(1 + monthlyRate, months) /
-            (Math.pow(1 + monthlyRate, months) - 1);
-        totalInterest = monthlyPayment * months - principal;
-      }
-      let effectiveAPR = 0;
-      const proceeds = principal - fees;
-      if (principal > 0 && proceeds > 0 && monthlyPayment > 0) {
-        let low = 0;
-        let high = 2;
-        for (let i = 0; i < 80; i++) {
-          const monthly = (low + high) / 2;
-          const presentValue = monthlyPayment * (1 - Math.pow(1 + monthly, -months)) / monthly;
-          if (presentValue > proceeds) low = monthly;
-          else high = monthly;
-        }
-        effectiveAPR = ((low + high) / 2) * 12 * 100;
-      }
-      text('aprMonthlyPmt', formatMoney(monthlyPayment));
-      text('aprTotalInterest', formatMoney(totalInterest));
-      text('aprTotalCost', formatMoney(totalInterest + fees));
-      text('aprEffective', `${effectiveAPR.toFixed(2)}%`);
-      runDealCalculator();
-    }
-
-    function runDealCalculator() {
-      const arv = Math.max(0, Number(document.getElementById('calcArv')?.value) || 0);
-      const repairs = Math.max(0, Number(document.getElementById('calcRepairs')?.value) || 0);
-      const fee = Math.max(0, Number(document.getElementById('calcFee')?.value) || 0);
-      const principal = Math.max(0, Number(document.getElementById('aprPrincipal')?.value) || 0);
-      const nominalAPR = Math.max(0, Number(document.getElementById('aprRate')?.value) || 0) / 100;
-      const buyerMax = Math.max(0, arv * 0.7 - repairs);
-      const mao = Math.max(0, buyerMax - fee);
-      const carry = principal * (nominalAPR / 12);
-      text('calcBuyerMax', formatMoney(buyerMax));
-      text('calcMAO', formatMoney(mao));
-      text('calcCarryEst', `${formatMoney(carry)}/mo`);
-    }
-
-    async function saveDealFromCalculator() {
-      if (!sb || !currentUser) {
-        text('calcStatus', '❌ Sign in before saving deals.');
-        return;
-      }
-      const address = document.getElementById('calcAddress').value.trim();
-      if (!address) {
-        text('calcStatus', 'Enter a property address.');
-        return;
-      }
-      const arv = Number(document.getElementById('calcArv').value) || null;
-      const repairs = Number(document.getElementById('calcRepairs').value) || 0;
-      const fee = Number(document.getElementById('calcFee').value) || 0;
-      const maxOffer = arv ? Math.max(0, Math.round(arv * 0.7 - repairs - fee)) : null;
-      const { data, error } = await sb.from('leads').insert([{
-        address,
-        estimated_arv: arv,
-        max_offer: maxOffer,
-        motivation_score: 20,
-        status: 'New',
-        tags: [],
-        notes: `Underwritten deal. Repairs: ${formatMoney(repairs)}`
-      }]).select();
-      if (error) {
-        text('calcStatus', `❌ Save error: ${error.message}`);
-        return;
-      }
-      cachedLeads = [...(data || []), ...cachedLeads];
-      updateDashboardStats();
-      renderLeads();
-      renderDashboardTopLeads();
-      text('calcStatus', `✅ Saved deal to pipeline: ${formatMoney(maxOffer)} MAO`);
-    }
-
     function exportCSV() {
-      const escapeCSV = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
-      const headers = [
-        'Created At', 'Status', 'Score', 'Address', 'Owner Name',
-        'Owner Phone', 'Est. ARV', 'MAO', 'Lat', 'Lon', 'Tags', 'Notes'
-      ];
-      const rows = cachedLeads.map((lead) => [
-        lead.created_at, lead.status || 'New', lead.motivation_score ?? '',
-        lead.address, lead.owner_name || '', lead.owner_phone || '',
-        lead.estimated_arv ?? '', lead.max_offer ?? '', lead.lat ?? '', lead.lon ?? '',
-        Array.isArray(lead.tags) ? lead.tags.join('; ') : (lead.tags || ''),
-        lead.notes || ''
-      ]);
-      const csv = [headers, ...rows].map((row) => row.map(escapeCSV).join(',')).join('\n');
-      const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const headers = ['Created At', 'Status', 'Score', 'Address', 'Owner Name', 'Owner Phone', 'Est. ARV', 'MAO', 'Tags', 'Notes'];
+      const rows = cachedLeads.map((l) => [l.created_at, l.status || 'New', l.motivation_score ?? '', l.address, l.owner_name || '', l.owner_phone || '', l.estimated_arv ?? '', l.max_offer ?? '', Array.isArray(l.tags) ? l.tags.join('; ') : '', l.notes || '']);
+      const csv = [headers, ...rows].map((r) => r.map(esc).join(',')).join('\n');
       const link = document.createElement('a');
-      link.href = url;
+      link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
       link.download = `dealscout-leads-${new Date().toISOString().slice(0, 10)}.csv`;
-      document.body.appendChild(link);
       link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
     }
 
-    window.addEventListener('hashchange', handleRoute);
     initAuth();
   </script>
 </body>
